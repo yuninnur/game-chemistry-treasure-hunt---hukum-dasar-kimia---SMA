@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chemistry Treasure Hunt - Hukum Dasar Kimia</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Roboto, system-ui, sans-serif; }
+  body {
+    background: linear-gradient(135deg,#1a2e3b,#0d1b26);
+    display:flex; justify-content:center; align-items:center;
+    min-height:100vh; padding:12px; overflow-x:hidden;
+  }
+  .game-wrapper {
+    background:#0d1b26; border-radius:28px;
+    box-shadow:0 20px 40px rgba(0,0,0,.7);
+    padding:18px; max-width:1150px; width:100%;
+    border:2px solid #f3c26b; position:relative;
+  }
+
+  /* ==== HALAMAN NAMA ==== */
+  .name-page {
+    display:flex; flex-direction:column; align-items:center;
+    justify-content:center; padding:36px 20px;
+    background: linear-gradient(145deg,#e9f2f0,#cfe4e0);
+    border-radius:24px; margin:6px; text-align:center;
+  }
+  .name-page h1 {
+    font-size:clamp(1.8rem,5vw,3rem); color:#1e4a5f;
+    text-shadow:3px 3px 0 #f3c26b; margin-bottom:6px;
+  }
+  .name-page h2 { font-size:clamp(1rem,3vw,1.5rem); color:#2c6e7a; margin-bottom:24px; }
+  .name-page input {
+    padding:12px 20px; font-size:1.15rem; border:2px solid #2c6e7a;
+    border-radius:60px; width:min(320px,80vw); text-align:center;
+    outline:none; margin-bottom:20px;
+  }
+  .name-page button, .btn {
+    background: linear-gradient(145deg,#f3c26b,#e3a94a);
+    border:none; padding:12px 38px; font-size:1.2rem; font-weight:bold;
+    border-radius:60px; color:#1e3a47; cursor:pointer;
+    box-shadow:0 5px 0 #b17f35; transition:.08s; letter-spacing:.5px;
+  }
+  .name-page button:active, .btn:active {
+    transform:translateY(5px); box-shadow:none;
+  }
+
+  /* ==== PETA PULAU ==== */
+  .map-container {
+    background:#5b9b8a;
+    background-image:
+      radial-gradient(circle at 20% 30%, #7bb8a5 5%, transparent 15%),
+      radial-gradient(circle at 80% 70%, #7bb8a5 8%, transparent 20%),
+      repeating-linear-gradient(45deg,#4a8273 0 2px,#5b9b8a 2px 8px);
+    border-radius:24px; padding:12px; position:relative;
+    border:4px solid #2f5e52; box-shadow:inset 0 0 30px #2f5e52;
+  }
+  .island-map {
+    display:flex; flex-wrap:wrap; justify-content:center;
+    gap:14px; padding:14px 6px; min-height:280px;
+  }
+  .island-card {
+    width:140px; background:linear-gradient(145deg,#dbbc7c,#b38f4a);
+    border-radius:40px 40px 20px 20px; padding:10px 6px 12px;
+    display:flex; flex-direction:column; align-items:center;
+    box-shadow:0 8px 0 #6b4f28,0 8px 16px rgba(0,0,0,.5);
+    border:2px solid #f3e3b0; transition:transform .2s;
+    cursor:pointer; position:relative;
+  }
+  .island-card.locked { filter:grayscale(.85); opacity:.7; cursor:not-allowed; }
+  .island-card.unlocked:hover { transform:translateY(-5px); }
+  .island-card .scientist-avatar {
+    width:80px; height:80px; background:#fcf3e0; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:2.5rem; border:3px solid #4a3720; margin-bottom:6px;
+    box-shadow:inset 0 0 0 3px #b38f4a;
+  }
+  .island-card .scientist-name {
+    font-weight:bold; font-size:.78rem; color:#2c1e0e;
+    text-align:center; background:#f7eac6; padding:3px 6px;
+    border-radius:20px; width:100%;
+  }
+  .island-card .law-name { font-size:.68rem; color:#3e2e1a; margin-top:2px; font-weight:600; text-align:center; }
+  .key-icon { position:absolute; top:-6px; right:-6px; font-size:1.6rem; filter:drop-shadow(2px 2px 2px rgba(0,0,0,.5)); }
+
+  /* ==== AREA KARAKTER ==== */
+  .adventure-area {
+    display:flex; flex-wrap:wrap; gap:12px;
+    justify-content:center; align-items:flex-start; margin-top:12px;
+  }
+  .character-box {
+    background:#2c4e5c; border-radius:20px; padding:14px;
+    width:190px; display:flex; flex-direction:column; align-items:center;
+    border:3px solid #f3c26b;
+  }
+  .hijab-character {
+    width:100px; height:100px; background:#d9b88b; border-radius:50%;
+    position:relative; display:flex; justify-content:center;
+    align-items:center; margin-bottom:8px; box-shadow:0 6px 0 #6b4f28;
+    border:3px solid #f3c26b; transition: transform .15s;
+  }
+  .hijab-character.bounce { animation: bounce .4s ease; }
+  @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+  .hijab-character .face {
+    width:58px; height:58px; background:#f7e1c0; border-radius:50%;
+    position:relative; display:flex; justify-content:center;
+    align-items:center; flex-direction:column;
+  }
+  .hijab-character .hijab {
+    position:absolute; width:94px; height:94px; background:#3a6ea5;
+    border-radius:60% 60% 30% 30% / 80% 80% 20% 20%;
+    top:-6px; left:3px; z-index:2; box-shadow:inset -5px -5px 0 #1f4a73;
+  }
+  .hijab-character .eyes { display:flex; gap:8px; margin-bottom:3px; }
+  .hijab-character .eye { width:9px; height:9px; background:#0f1a1f; border-radius:50%; }
+  .hijab-character .smile { width:20px; height:9px; border-bottom:3px solid #a52a2a; border-radius:0 0 20px 20px; }
+  .controls { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-top:6px; width:100%; }
+  .controls button {
+    background:linear-gradient(145deg,#f3c26b,#e3a94a); border:none;
+    border-radius:14px; font-size:1.6rem; padding:6px 0; font-weight:bold;
+    color:#1e3a47; cursor:pointer; box-shadow:0 4px 0 #b17f35;
+    transition:.05s; display:flex; justify-content:center; align-items:center;
+  }
+  .controls button:active { transform:translateY(4px); box-shadow:none; }
+  .controls .empty { visibility:hidden; }
+
+  .inventory-box {
+    background:#2c4e5c; border-radius:20px; padding:14px;
+    flex:1; min-width:170px; border:3px solid #f3c26b; color:#f7eac6;
+  }
+  .inventory-box h3 { font-size:1.2rem; margin-bottom:8px; text-align:center; color:#f3c26b; }
+  .key-list { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; font-size:1.6rem; }
+  .key-list span { background:#1f3a44; padding:4px 10px; border-radius:30px; }
+  .inventory-box .stats { display:flex; justify-content:space-around; margin-top:12px; font-weight:bold; }
+  .inventory-box .stats div { text-align:center; font-size:.9rem; }
+  .inventory-box .stats span { display:block; font-size:1.3rem; color:#f3c26b; }
+
+  .message-panel {
+    background:#e9f2f0; border-radius:16px; padding:10px 16px;
+    margin:12px 0 0; font-weight:600; color:#1e4a5f; text-align:center;
+    font-size:1rem; border-left:8px solid #f3c26b; min-height:56px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .win-message {
+    font-size:1.3rem; font-weight:bold; color:#f3c26b; text-align:center;
+    background:#1f3a44; padding:16px; border-radius:24px; margin:12px 0;
+    border:2px solid #f3c26b; animation: pulse 1.4s infinite;
+  }
+  @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.03)} }
+
+  /* ==== MODAL MATERI ==== */
+  .modal {
+    position:fixed; inset:0; background:rgba(0,0,0,.75);
+    display:none; justify-content:center; align-items:center; z-index:1000; padding:12px;
+  }
+  .modal.open { display:flex; animation: fadeIn .2s; }
+  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+  .modal-content {
+    background:#fef9e8; max-width:520px; width:100%;
+    border-radius:28px; padding:22px; box-shadow:0 20px 30px black;
+    border:5px solid #f3c26b; position:relative;
+    max-height:90vh; overflow-y:auto;
+  }
+  .modal-content h2 { color:#1e4a5f; font-size:1.5rem; margin-bottom:6px; display:flex; align-items:center; gap:8px; }
+  .modal-content h3 { color:#2c6e7a; margin:12px 0 6px; }
+  .modal-content p { font-size:1rem; line-height:1.5; color:#1e2e2e; }
+  .modal-content .example {
+    background:#d9e9e6; padding:10px 14px; border-radius:16px;
+    margin:10px 0; font-style:italic; border-left:6px solid #2c6e7a; font-size:.95rem;
+  }
+  .modal-content button {
+    background:linear-gradient(145deg,#f3c26b,#e3a94a); border:none;
+    padding:10px 26px; font-size:1.1rem; font-weight:bold;
+    border-radius:40px; color:#1e3a47; cursor:pointer;
+    box-shadow:0 4px 0 #b17f35; margin-top:12px; transition:.1s;
+  }
+  .modal-content button:active { transform:translateY(4px); box-shadow:none; }
+  .close-modal {
+    position:absolute; top:10px; right:16px; font-size:1.8rem;
+    cursor:pointer; color:#5e3f1c; font-weight:bold;
+  }
+
+  /* ==== PAPAN ULAR TANGGA ==== */
+  #boardGameSection { margin-top:18px; display:none; }
+  #boardGameSection.active { display:block; animation: slideUp .4s ease; }
+  @keyframes slideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+  .board-header {
+    display:flex; flex-wrap:wrap; justify-content:space-between;
+    align-items:center; gap:10px; margin-bottom:12px;
+  }
+  .board-header h2 { color:#f3c26b; font-size:1.4rem; text-shadow:2px 2px 0 #000; }
+  .board-controls { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .board-controls button {
+    background:linear-gradient(145deg,#f3c26b,#e3a94a); border:none;
+    padding:8px 16px; font-weight:bold; border-radius:30px;
+    cursor:pointer; box-shadow:0 4px 0 #b17f35; color:#1e3a47;
+    transition:.1s; font-size:.95rem;
+  }
+  .board-controls button:active { transform:translateY(4px); box-shadow:none; }
+  .board-controls button:disabled { opacity:.5; cursor:not-allowed; box-shadow:0 4px 0 #7a5e2e; }
+
+  .board-stats {
+    display:flex; gap:14px; flex-wrap:wrap; background:#1f3a44;
+    padding:10px 16px; border-radius:20px; color:#f3c26b; font-weight:bold;
+    justify-content:center; border:2px solid #f3c26b;
+  }
+  .board-stats span { color:#fff; }
+
+  .board-grid {
+    display:grid; grid-template-columns:repeat(5,1fr);
+    gap:6px; background:#2f5e52; padding:10px;
+    border-radius:20px; border:3px solid #f3c26b; margin-top:10px;
+  }
+  .cell {
+    aspect-ratio:1/1; background:linear-gradient(145deg,#f7eac6,#e9d6a3);
+    border-radius:12px; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; position:relative;
+    font-size:.65rem; font-weight:bold; color:#3e2e1a;
+    text-align:center; padding:2px; border:2px solid #b38f4a;
+    transition:.2s; cursor:default;
+  }
+  .cell .cell-num {
+    position:absolute; top:2px; left:5px; font-size:.6rem;
+    color:#6b4f28; font-weight:bold;
+  }
+  .cell .cell-icon { font-size:1.1rem; }
+  .cell.snake { background:linear-gradient(145deg,#e8b4b4,#d28a8a); }
+  .cell.ladder { background:linear-gradient(145deg,#b4e0b4,#7bc97b); }
+  .cell.start { background:linear-gradient(145deg,#f3d97a,#e3b94a); }
+  .cell.finish { background:linear-gradient(145deg,#f3c26b,#dba83a); box-shadow:0 0 12px #f3c26b; }
+  .cell .players-here {
+    display:flex; gap:2px; position:absolute; bottom:2px;
+    font-size:.8rem;
+  }
+  .cell .pawn { animation: pawnPop .3s ease; }
+  @keyframes pawnPop { from{transform:scale(0)} to{transform:scale(1)} }
+
+  .dice-area {
+    display:flex; flex-wrap:wrap; gap:14px; align-items:center;
+    justify-content:center; margin-top:14px;
+    background:#2c4e5c; padding:14px; border-radius:20px;
+    border:3px solid #f3c26b;
+  }
+  .dice {
+    width:70px; height:70px; background:#fef9e8; border-radius:16px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:2.4rem; font-weight:bold; color:#1e3a47;
+    box-shadow:0 6px 0 #b17f35, inset 0 0 0 3px #f3c26b;
+    transition:.2s;
+  }
+  .dice.rolling { animation: rollAnim .6s ease; }
+  @keyframes rollAnim {
+    0%{transform:rotate(0) scale(1)}
+    25%{transform:rotate(90deg) scale(1.1)}
+    50%{transform:rotate(180deg) scale(.95)}
+    75%{transform:rotate(270deg) scale(1.1)}
+    100%{transform:rotate(360deg) scale(1)}
+  }
+  .dice-info { color:#f3c26b; font-weight:bold; font-size:1rem; }
+
+  /* ==== MODAL KUIS ==== */
+  .quiz-modal {
+    position:fixed; inset:0; background:rgba(0,0,0,.8);
+    display:none; justify-content:center; align-items:center; z-index:1100; padding:12px;
+  }
+  .quiz-modal.open { display:flex; animation:fadeIn .2s; }
+  .quiz-content {
+    background:linear-gradient(160deg,#fef9e8,#f2e6c9);
+    max-width:540px; width:100%; border-radius:28px;
+    padding:22px; box-shadow:0 20px 40px black;
+    border:5px solid #f3c26b; max-height:92vh; overflow-y:auto;
+    position:relative;
+  }
+  .quiz-content h3 {
+    color:#1e4a5f; font-size:1.3rem; margin-bottom:10px;
+    text-align:center;
+  }
+  .quiz-category {
+    display:inline-block; background:#2c6e7a; color:#fff;
+    padding:3px 12px; border-radius:20px; font-size:.75rem;
+    margin-bottom:10px; font-weight:bold;
+  }
+  .quiz-question {
+    font-size:1.05rem; color:#1e2e2e; margin-bottom:14px;
+    line-height:1.5; font-weight:600;
+  }
+  .quiz-options { display:flex; flex-direction:column; gap:8px; }
+  .quiz-options button {
+    background:#fff; border:2px solid #2c6e7a; padding:10px 14px;
+    border-radius:14px; font-size:.98rem; cursor:pointer;
+    text-align:left; transition:.15s; color:#1e2e2e; font-weight:500;
+  }
+  .quiz-options button:hover:not(:disabled) {
+    background:#d9e9e6; transform:translateX(4px);
+  }
+  .quiz-options button.correct { background:#7bc97b; border-color:#3a8a3a; color:#fff; }
+  .quiz-options button.wrong { background:#e8a4a4; border-color:#a53a3a; color:#fff; }
+  .quiz-options button:disabled { cursor:default; }
+  .quiz-feedback {
+    margin-top:14px; padding:12px 16px; border-radius:16px;
+    font-size:.95rem; line-height:1.4; display:none;
+  }
+  .quiz-feedback.show { display:block; animation:fadeIn .3s; }
+  .quiz-feedback.correct-fb { background:#d4f0d4; border-left:6px solid #3a8a3a; color:#1e4a1e; }
+  .quiz-feedback.wrong-fb { background:#f7d4d4; border-left:6px solid #a53a3a; color:#4a1e1e; }
+  .quiz-feedback .reward { font-weight:bold; color:#b17f35; }
+
+  .sound-toggle {
+    position:absolute; top:14px; right:14px;
+    background:#2c4e5c; border:2px solid #f3c26b; color:#f3c26b;
+    width:38px; height:38px; border-radius:50%; cursor:pointer;
+    font-size:1.1rem; display:flex; align-items:center; justify-content:center;
+    z-index:50;
+  }
+
+  /* ==== RESPONSIVE ==== */
+  @media (max-width:720px) {
+    .game-wrapper { padding:10px; border-radius:18px; }
+    .island-card { width:110px; }
+    .island-card .scientist-avatar { width:60px; height:60px; font-size:1.8rem; }
+    .island-card .scientist-name { font-size:.65rem; }
+    .island-card .law-name { font-size:.58rem; }
+    .character-box { width:160px; padding:10px; }
+    .board-grid { gap:4px; padding:6px; }
+    .cell { border-radius:8px; }
+    .dice { width:56px; height:56px; font-size:1.8rem; }
+  }
+  @media (max-width:420px) {
+    .island-card { width:92px; padding:6px 3px 8px; }
+    .island-card .scientist-avatar { width:50px; height:50px; font-size:1.4rem; }
+    .character-box { width:140px; }
+    .board-stats { font-size:.8rem; gap:8px; padding:8px 10px; }
+  }
+</style>
+</head>
+<body>
+<div class="game-wrapper" id="gameWrapper">
+
+  <!-- ==== HALAMAN NAMA ==== -->
+  <div id="namePage" class="name-page">
+    <h1>🏝️ Chemistry Treasure Hunt</h1>
+    <h2>Hukum Dasar Kimia Kelas X</h2>
+    <input type="text" id="playerNameInput" placeholder="Masukkan namamu..." maxlength="20" autocomplete="off">
+    <button id="startBtn">⚓ Mulai Petualangan</button>
+  </div>
+
+  <!-- ==== GAME UTAMA ==== -->
+  <div id="mainGame" style="display:none;">
+    <button class="sound-toggle" id="soundToggle" title="Musik On/Off">🔊</button>
+
+    <!-- Peta Pulau -->
+    <div class="map-container">
+      <div class="island-map" id="islandMap"></div>
+    </div>
+
+    <!-- Karakter & Inventaris -->
+    <div class="adventure-area">
+      <div class="character-box">
+        <div class="hijab-character" id="hijabChar">
+          <div class="hijab"></div>
+          <div class="face">
+            <div class="eyes"><div class="eye"></div><div class="eye"></div></div>
+            <div class="smile"></div>
+          </div>
+        </div>
+        <div style="color:#f3c26b; font-weight:bold; margin-bottom:6px;" id="playerNameDisplay">Aisyah</div>
+        <div class="controls">
+          <div class="empty"></div><button data-dir="up">⬆️</button><div class="empty"></div>
+          <button data-dir="left">⬅️</button><div class="empty"></div><button data-dir="right">➡️</button>
+          <div class="empty"></div><button data-dir="down">⬇️</button><div class="empty"></div>
+        </div>
+      </div>
+
+      <div class="inventory-box">
+        <h3>🔑 Kunci</h3>
+        <div class="key-list" id="keyList">Belum ada kunci</div>
+        <div class="stats">
+          <div>Skor <span id="scoreDisplay">0</span></div>
+          <div>Koin <span id="coinDisplay">0</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="message-panel" id="messagePanel">Selamat datang, jelajahi pulau dan klik ilmuwan!</div>
+    <div id="winMessage" class="win-message" style="display:none;">🎉 Selamat! Kamu telah menguasai 5 Hukum Dasar Kimia! 🎉</div>
+
+    <!-- ==== PAPAN ULAR TANGGA KUIS ==== -->
+    <div id="boardGameSection">
+      <div class="board-header">
+        <h2>🎲 Ular Tangga Kimia</h2>
+        <div class="board-controls">
+          <button id="rollDiceBtn">🎲 Lempar Dadu</button>
+          <button id="resetBoardBtn">🔄 Ulang Kuis</button>
+        </div>
+      </div>
+
+      <div class="board-stats">
+        <div>Posisi Pion: <span id="boardPosDisplay">1</span></div>
+        <div>Skor Kuis: <span id="boardScoreDisplay">0</span></div>
+        <div>Koin: <span id="boardCoinDisplay">0</span></div>
+        <div>Soal Dijawab: <span id="boardProgressDisplay">0/15</span></div>
+      </div>
+
+      <div class="board-grid" id="boardGrid"></div>
+
+      <div class="dice-area">
+        <div class="dice" id="diceDisplay">🎲</div>
+        <div class="dice-info" id="diceInfo">Klik "Lempar Dadu" untuk mulai!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==== MODAL MATERI ==== -->
+  <div id="materialModal" class="modal">
+    <div class="modal-content" id="modalContent"></div>
+  </div>
+
+  <!-- ==== MODAL KUIS ==== -->
+  <div id="quizModal" class="quiz-modal">
+    <div class="quiz-content" id="quizContent"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ============================================================
+     DATA
+     ============================================================ */
+  const laws = [
+    { id:0, name:'Hukum Kekekalan Massa', scientist:'Antoine Lavoisier', avatar:'⚗️',
+      material:'Massa zat sebelum dan sesudah reaksi kimia adalah sama. Lavoisier menyimpulkan bahwa dalam sistem tertutup, massa total zat tidak berubah.',
+      example:'10 gram CaCO3 dipanaskan menghasilkan 5,6 gram CaO dan 4,4 gram CO2. Massa sebelum = 10g, sesudah = 5,6+4,4 = 10g.' },
+    { id:1, name:'Hukum Perbandingan Tetap', scientist:'Joseph Proust', avatar:'🧪',
+      material:'Perbandingan massa unsur-unsur dalam suatu senyawa selalu tetap, tidak tergantung dari mana senyawa itu berasal.',
+      example:'Dalam H2O, perbandingan massa H : O = 1 : 8. Jika 2 gram H bereaksi, diperlukan 16 gram O.' },
+    { id:2, name:'Hukum Perbandingan Berganda', scientist:'John Dalton', avatar:'🔬',
+      material:'Jika dua unsur dapat membentuk lebih dari satu senyawa, perbandingan massa unsur yang sama pada senyawa-senyawa tersebut merupakan bilangan bulat sederhana.',
+      example:'Karbon dan oksigen membentuk CO dan CO2. Massa O untuk massa C yang sama adalah 1 : 2.' },
+    { id:3, name:'Hukum Perbandingan Volume', scientist:'Gay-Lussac', avatar:'📏',
+      material:'Pada suhu dan tekanan yang sama, perbandingan volume gas-gas yang bereaksi dan hasil reaksi merupakan bilangan bulat sederhana.',
+      example:'2 volume gas H2 + 1 volume gas O2 → 2 volume uap air.' },
+    { id:4, name:'Hukum Avogadro', scientist:'Amedeo Avogadro', avatar:'⚛️',
+      material:'Pada suhu dan tekanan yang sama, gas-gas yang volumenya sama mengandung jumlah molekul yang sama.',
+      example:'1 liter gas O2 dan 1 liter gas N2 pada suhu & tekanan sama memiliki jumlah molekul yang sama.' }
+  ];
+
+  /* ============================================================
+     STATE
+     ============================================================ */
+  let playerName = 'Aisyah';
+  let collectedKeys = [false,false,false,false,false];
+  let unlockedIslands = [true,false,false,false,false];
+  let playerPosition = 0;
+  let score = 0;
+  let coins = 0;
+  let soundOn = true;
+  let answeredCount = 0; // untuk progres kuis
+
+  // Board state
+  const BOARD_SIZE = 25; // 5x5
+  let boardPosition = 0; // index 0..24
+  let boardScore = 0;
+  let boardCoins = 0;
+  let boardAnswered = 0;
+  const TOTAL_QUIZ_QUESTIONS = 15;
+  let isRolling = false;
+
+  // Tangga (index naik) & ular (index turun)
+  const ladders = { 2:8, 6:13, 11:17, 15:22 };
+  const snakes  = { 19:7, 21:12, 23:14, 24:16 };
+
+  /* ============================================================
+     DOM
+     ============================================================ */
+  const namePage = document.getElementById('namePage');
+  const mainGame = document.getElementById('mainGame');
+  const startBtn = document.getElementById('startBtn');
+  const playerNameInput = document.getElementById('playerNameInput');
+  const playerNameDisplay = document.getElementById('playerNameDisplay');
+  const islandMap = document.getElementById('islandMap');
+  const keyListDiv = document.getElementById('keyList');
+  const messagePanel = document.getElementById('messagePanel');
+  const materialModal = document.getElementById('materialModal');
+  const modalContent = document.getElementById('modalContent');
+  const winMessageDiv = document.getElementById('winMessage');
+  const scoreDisplay = document.getElementById('scoreDisplay');
+  const coinDisplay = document.getElementById('coinDisplay');
+  const hijabChar = document.getElementById('hijabChar');
+  const soundToggle = document.getElementById('soundToggle');
+  const boardGameSection = document.getElementById('boardGameSection');
+  const boardGrid = document.getElementById('boardGrid');
+  const rollDiceBtn = document.getElementById('rollDiceBtn');
+  const resetBoardBtn = document.getElementById('resetBoardBtn');
+  const diceDisplay = document.getElementById('diceDisplay');
+  const diceInfo = document.getElementById('diceInfo');
+  const boardPosDisplay = document.getElementById('boardPosDisplay');
+  const boardScoreDisplay = document.getElementById('boardScoreDisplay');
+  const boardCoinDisplay = document.getElementById('boardCoinDisplay');
+  const boardProgressDisplay = document.getElementById('boardProgressDisplay');
+  const quizModal = document.getElementById('quizModal');
+  const quizContent = document.getElementById('quizContent');
+
+  /* ============================================================
+     AUDIO (Web Audio API - efek suara & musik)
+     ============================================================ */
+  let audioCtx = null;
+  let musicOsc = null, musicGain = null, musicInterval = null;
+
+  function initAudio() {
+    if (!audioCtx) {
+      try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) { audioCtx = null; }
+    }
+    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+  }
+
+  function playTone(freq, duration, type='sine', vol=0.15) {
+    if (!soundOn || !audioCtx) return;
+    try {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+      osc.connect(gain).connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration);
+    } catch(e) {}
+  }
+
+  function playClick() { playTone(600, .08, 'square', .1); }
+  function playCorrect() {
+    playTone(523, .12, 'sine', .15);
+    setTimeout(()=>playTone(659, .12, 'sine', .15), 100);
+    setTimeout(()=>playTone(784, .2, 'sine', .15), 200);
+  }
+  function playWrong() {
+    playTone(300, .2, 'sawtooth', .12);
+    setTimeout(()=>playTone(200, .3, 'sawtooth', .12), 150);
+  }
+  function playDice() {
+    playTone(400, .06, 'square', .1);
+    setTimeout(()=>playTone(500, .06, 'square', .1), 80);
+    setTimeout(()=>playTone(600, .06, 'square', .1), 160);
+    setTimeout(()=>playTone(700, .1, 'square', .1), 240);
+  }
+  function playWin() {
+    const notes = [523, 587, 659, 784, 880, 1046];
+    notes.forEach((n,i)=>setTimeout(()=>playTone(n, .25, 'sine', .18), i*140));
+  }
+  function playMove() { playTone(700, .05, 'triangle', .08); }
+
+  // Musik latar sederhana
+  function startMusic() {
+    if (!audioCtx || !soundOn) return;
+    stopMusic();
+    const notes = [262, 330, 392, 330, 294, 349, 440, 349, 262, 330, 392, 523, 440, 392, 330, 294];
+    let i = 0;
+    musicInterval = setInterval(()=>{
+      if (!soundOn) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.value = notes[i % notes.length];
+        gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.7);
+        osc.connect(gain).connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.7);
+        i++;
+      } catch(e) {}
+    }, 500);
+  }
+  function stopMusic() {
+    if (musicInterval) { clearInterval(musicInterval); musicInterval = null; }
+    if (musicOsc) { try{musicOsc.stop();}catch(e){} musicOsc = null; }
+  }
+
+  soundToggle.addEventListener('click', () => {
+    soundOn = !soundOn;
+    soundToggle.textContent = soundOn ? '🔊' : '🔇';
+    if (soundOn) { initAudio(); startMusic(); } else { stopMusic(); }
+    playClick();
+  });
+
+  /* ============================================================
+     RENDER PETA
+     ============================================================ */
+  function renderMap() {
+    islandMap.innerHTML = '';
+    laws.forEach((law, idx) => {
+      const card = document.createElement('div');
+      card.className = 'island-card ' + (unlockedIslands[idx] ? 'unlocked' : 'locked');
+      card.dataset.index = idx;
+
+      const avatarDiv = document.createElement('div');
+      avatarDiv.className = 'scientist-avatar';
+      avatarDiv.textContent = law.avatar;
+      card.appendChild(avatarDiv);
+
+      const nameDiv = document.createElement('div');
+      nameDiv.className = 'scientist-name';
+      nameDiv.textContent = law.scientist;
+      card.appendChild(nameDiv);
+
+      const lawDiv = document.createElement('div');
+      lawDiv.className = 'law-name';
+      lawDiv.textContent = law.name;
+      card.appendChild(lawDiv);
+
+      if (collectedKeys[idx]) {
+        const keySpan = document.createElement('span');
+        keySpan.className = 'key-icon';
+        keySpan.textContent = '🔑';
+        card.appendChild(keySpan);
+      }
+
+      if (unlockedIslands[idx]) {
+        card.addEventListener('click', () => { playClick(); openMaterialModal(idx); });
+      } else {
+        card.addEventListener('click', () => {
+          playWrong();
+          messagePanel.textContent = `🔒 Pulau ${laws[idx].scientist} masih terkunci. Selesaikan materi sebelumnya!`;
+        });
+      }
+      islandMap.appendChild(card);
+    });
+  }
+
+  /* ============================================================
+     MODAL MATERI
+     ============================================================ */
+  function openMaterialModal(lawId) {
+    const law = laws[lawId];
+    const hasKey = collectedKeys[lawId];
+
+    modalContent.innerHTML = `
+      <span class="close-modal" id="closeModalBtn">&times;</span>
+      <h2>${law.avatar} ${law.scientist}</h2>
+      <h3>${law.name}</h3>
+      <p>${law.material}</p>
+      <div class="example"><strong>📘 Contoh Soal:</strong> ${law.example}</div>
+      ${!hasKey ? `<button id="claimKeyBtn">🔑 Ambil Kunci & Selesai</button>` :
+                   `<p style="color:green; font-weight:bold;">✅ Kamu sudah menyelesaikan materi ini</p>`}
+    `;
+    materialModal.classList.add('open');
+
+    document.getElementById('closeModalBtn').addEventListener('click', () => {
+      materialModal.classList.remove('open');
+    });
+
+    const claimBtn = document.getElementById('claimKeyBtn');
+    if (claimBtn) {
+      claimBtn.addEventListener('click', () => {
+        claimKey(lawId);
+        materialModal.classList.remove('open');
+      });
+    }
+  }
+
+  function claimKey(lawId) {
+    if (collectedKeys[lawId]) return;
+    collectedKeys[lawId] = true;
+    if (lawId + 1 < unlockedIslands.length) unlockedIslands[lawId + 1] = true;
+
+    updateKeyDisplay();
+    renderMap();
+    playCorrect();
+
+    messagePanel.textContent = `✅ Kamu mendapatkan kunci ${laws[lawId].name}! Pulau berikutnya terbuka.`;
+    hijabChar.classList.add('bounce');
+    setTimeout(()=>hijabChar.classList.remove('bounce'), 400);
+
+    if (collectedKeys.every(v => v)) {
+      winMessageDiv.style.display = 'block';
+      messagePanel.textContent = '🎉 Hebat! Semua hukum dasar kimia telah dikuasai! Ular tangga kuis terbuka!';
+      playWin();
+      // Aktifkan board game
+      boardGameSection.classList.add('active');
+      setTimeout(() => {
+        boardGameSection.scrollIntoView({ behavior:'smooth', block:'start' });
+      }, 600);
+    }
+  }
+
+  function updateKeyDisplay() {
+    const keys = collectedKeys.map((v,i)=> v ? '🔑' : null).filter(Boolean);
+    keyListDiv.innerHTML = keys.length ? keys.map(k=>`<span>${k}</span>`).join('') : 'Belum ada kunci';
+    scoreDisplay.textContent = score;
+    coinDisplay.textContent = coins;
+  }
+
+  /* ============================================================
+     KONTROL KARAKTER
+     ============================================================ */
+  function moveCharacter(dir) {
+    let newPos = playerPosition;
+    if (dir === 'left' && playerPosition > 0) newPos = playerPosition - 1;
+    else if (dir === 'right' && playerPosition < laws.length - 1) newPos = playerPosition + 1;
+    else if (dir === 'up') { messagePanel.textContent = `🧭 ${playerName} melihat ke atas, langit cerah!`; return; }
+    else if (dir === 'down') { messagePanel.textContent = `🧭 ${playerName} melihat ke bawah, pantai indah!`; return; }
+
+    if (newPos !== playerPosition) {
+      if (!unlockedIslands[newPos]) {
+        playWrong();
+        messagePanel.textContent = `🔒 Pulau ${laws[newPos].scientist} masih terkunci.`;
+        return;
+      }
+      playerPosition = newPos;
+      playMove();
+      hijabChar.classList.add('bounce');
+      setTimeout(()=>hijabChar.classList.remove('bounce'), 400);
+      messagePanel.textContent = `🧕 ${playerName} tiba di pulau ${laws[playerPosition].scientist}. Klik ilmuwan untuk belajar.`;
+    } else {
+      if (dir === 'left') messagePanel.textContent = `⬅️ ${playerName} sudah di pulau paling kiri.`;
+      else if (dir === 'right') messagePanel.textContent = `➡️ ${playerName} sudah di pulau paling kanan.`;
+    }
+  }
+
+  /* ============================================================
+     BOARD GAME - ULAR TANGGA
+     ============================================================ */
+  function renderBoard() {
+    boardGrid.innerHTML = '';
+    for (let i = 0; i < BOARD_SIZE; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.dataset.idx = i;
+
+      const num = document.createElement('div');
+      num.className = 'cell-num';
+      num.textContent = i + 1;
+      cell.appendChild(num);
+
+      const icon = document.createElement('div');
+      icon.className = 'cell-icon';
+      if (i === 0) { cell.classList.add('start'); icon.textContent = '🚩'; }
+      else if (i === BOARD_SIZE - 1) { cell.classList.add('finish'); icon.textContent = '🏁'; }
+      else if (ladders[i]) { cell.classList.add('ladder'); icon.textContent = '🪜'; }
+      else if (snakes[i]) { cell.classList.add('snake'); icon.textContent = '🐍'; }
+      else { icon.textContent = '❓'; }
+      cell.appendChild(icon);
+
+      const playersHere = document.createElement('div');
+      playersHere.className = 'players-here';
+      playersHere.id = 'players-' + i;
+      cell.appendChild(playersHere);
+
+      boardGrid.appendChild(cell);
+    }
+    updateBoardUI();
+  }
+
+  function updateBoardUI() {
+    // Hapus pion lama
+    document.querySelectorAll('.players-here').forEach(el => el.innerHTML = '');
+    // Tambahkan pion di posisi saat ini
+    const cellHere = document.getElementById('players-' + boardPosition);
+    if (cellHere) {
+      const pawn = document.createElement('span');
+      pawn.className = 'pawn';
+      pawn.textContent = '🧕';
+      cellHere.appendChild(pawn);
+    }
+    boardPosDisplay.textContent = boardPosition + 1;
+    boardScoreDisplay.textContent = boardScore;
+    boardCoinDisplay.textContent = boardCoins;
+    boardProgressDisplay.textContent = boardAnswered + '/' + TOTAL_QUIZ_QUESTIONS;
+  }
+
+  /* ============================================================
+     BANK SOAL KUIS
+     ============================================================ */
+  const quizBank = [
+    // Pilihan Ganda
+    { type:'mc', cat:'Pilihan Ganda',
+      q:'Hukum Kekekalan Massa dikemukakan oleh...',
+      opts:['John Dalton','Antoine Lavoisier','Joseph Proust','Amedeo Avogadro'],
+      ans:1,
+      exp:'Antoine Lavoisier adalah ilmuwan yang mengemukakan Hukum Kekekalan Massa.' },
+    { type:'mc', cat:'Pilihan Ganda',
+      q:'Perbandingan massa H : O dalam H2O adalah...',
+      opts:['1 : 8','2 : 8','1 : 16','2 : 16'],
+      ans:0,
+      exp:'Dalam H2O, Ar H=1 dan O=16, maka perbandingan massa H:O = 2:16 = 1:8.' },
+    { type:'mc', cat:'Pilihan Ganda',
+      q:'Hukum Perbandingan Berganda dikemukakan oleh...',
+      opts:['Gay-Lussac','Proust','Dalton','Avogadro'],
+      ans:2,
+      exp:'John Dalton mengemukakan Hukum Perbandingan Berganda (Hukum Dalton).' },
+    { type:'mc', cat:'Pilihan Ganda',
+      q:'Pada suhu dan tekanan sama, gas yang volumenya sama memiliki jumlah molekul sama. Pernyataan ini adalah...',
+      opts:['Hukum Proust','Hukum Gay-Lussac','Hukum Avogadro','Hukum Dalton'],
+      ans:2,
+      exp:'Ini adalah Hukum Avogadro tentang jumlah molekul gas.' },
+    { type:'mc', cat:'Pilihan Ganda',
+      q:'2 volume H2 + 1 volume O2 → 2 volume H2O. Pernyataan ini sesuai dengan hukum...',
+      opts:['Kekekalan Massa','Perbandingan Volume','Perbandingan Tetap','Avogadro'],
+      ans:1,
+      exp:'Hukum Perbandingan Volume (Gay-Lussac) tentang perbandingan volume gas.' },
+    { type:'mc', cat:'Pilihan Ganda',
+      q:'Jika 4 gram H2 bereaksi dengan 32 gram O2 membentuk H2O, massa H2O yang terbentuk adalah...',
+      opts:['32 gram','36 gram','28 gram','40 gram'],
+      ans:1,
+      exp:'Berdasarkan Hukum Kekekalan Massa: 4 + 32 = 36 gram H2O.' },
+    { type:'mc', cat:'Pilihan Ganda',
+      q:'Unsur C dan O membentuk CO dan CO2. Perbandingan massa O untuk massa C yang sama adalah...',
+      opts:['1 : 1','1 : 2','2 : 1','1 : 3'],
+      ans:1,
+      exp:'CO: C:O = 12:16 = 3:4. CO2: C:O = 12:32 = 3:8. Perbandingan O = 4:8 = 1:2.' },
+
+    // Benar / Salah
+    { type:'tf', cat:'Benar / Salah',
+      q:'Hukum Kekekalan Massa berlaku hanya pada reaksi dalam wadah tertutup.',
+      ans:true,
+      exp:'Benar. Dalam sistem tertutup, massa total zat sebelum dan sesudah reaksi sama.' },
+    { type:'tf', cat:'Benar / Salah',
+      q:'Perbandingan massa unsur dalam suatu senyawa berubah tergantung asal senyawa tersebut.',
+      ans:false,
+      exp:'Salah. Hukum Proust menyatakan perbandingan massa unsur dalam senyawa selalu tetap.' },
+    { type:'tf', cat:'Benar / Salah',
+      q:'Hukum Avogadro menyatakan bahwa volume gas yang sama pada suhu dan tekanan sama mengandung jumlah molekul yang sama.',
+      ans:true,
+      exp:'Benar. Itulah bunyi Hukum Avogadro.' },
+    { type:'tf', cat:'Benar / Salah',
+      q:'Air (H2O) memiliki perbandingan massa H : O = 1 : 16.',
+      ans:false,
+      exp:'Salah. Perbandingan massa H : O dalam H2O adalah 1 : 8.' },
+
+    // Tebak Hukum
+    { type:'guess', cat:'Tebak Hukum',
+      q:'"Massa zat sebelum dan sesudah reaksi kimia selalu sama." Hukum ini adalah...',
+      opts:['Hukum Proust','Hukum Lavoisier','Hukum Dalton','Hukum Gay-Lussac'],
+      ans:1,
+      exp:'Ini adalah Hukum Kekekalan Massa (Lavoisier).' },
+    { type:'guess', cat:'Tebak Hukum',
+      q:'"Perbandingan massa unsur-unsur dalam senyawa selalu tetap." Hukum ini adalah...',
+      opts:['Hukum Dalton','Hukum Avogadro','Hukum Proust','Hukum Lavoisier'],
+      ans:2,
+      exp:'Ini adalah Hukum Perbandingan Tetap (Proust).' },
+    { type:'guess', cat:'Tebak Hukum',
+      q:'"Pada suhu dan tekanan sama, gas yang volumenya sama memiliki jumlah molekul sama." Hukum ini adalah...',
+      opts:['Hukum Avogadro','Hukum Gay-Lussac','Hukum Dalton','Hukum Proust'],
+      ans:0,
+      exp:'Ini adalah Hukum Avogadro.' },
+    { type:'guess', cat:'Tebak Hukum',
+      q:'"Perbandingan volume gas-gas yang bereaksi merupakan bilangan bulat sederhana." Hukum ini adalah...',
+      opts:['Hukum Lavoisier','Hukum Dalton','Hukum Gay-Lussac','Hukum Proust'],
+      ans:2,
+      exp:'Ini adalah Hukum Perbandingan Volume (Gay-Lussac).' },
+
+    // Mencocokkan Konsep
+    { type:'match', cat:'Mencocokkan Konsep',
+      q:'Pasangkan: "Massa sebelum = massa sesudah" termasuk hukum...',
+      opts:['Kekekalan Massa','Perbandingan Tetap','Perbandingan Berganda','Avogadro'],
+      ans:0,
+      exp:'Hukum Kekekalan Massa (Lavoisier): massa sebelum = massa sesudah.' },
+    { type:'match', cat:'Mencocokkan Konsep',
+      q:'Pasangkan: "H : O = 1 : 8 dalam H2O" termasuk hukum...',
+      opts:['Kekekalan Massa','Perbandingan Tetap','Perbandingan Berganda','Avogadro'],
+      ans:1,
+      exp:'Hukum Perbandingan Tetap (Proust): perbandingan massa unsur dalam senyawa selalu tetap.' },
+    { type:'match', cat:'Mencocokkan Konsep',
+      q:'Pasangkan: "CO dan CO2 perbandingan O = 1 : 2" termasuk hukum...',
+      opts:['Kekekalan Massa','Perbandingan Tetap','Perbandingan Berganda','Avogadro'],
+      ans:2,
+      exp:'Hukum Perbandingan Berganda (Dalton): perbandingan massa unsur yang sama pada senyawa berbeda = bilangan bulat sederhana.' },
+    { type:'match', cat:'Mencocokkan Konsep',
+      q:'Pasangkan: "2 volume H2 + 1 volume O2 → 2 volume H2O" termasuk hukum...',
+      opts:['Kekekalan Massa','Perbandingan Volume','Perbandingan Berganda','Avogadro'],
+      ans:1,
+      exp:'Hukum Perbandingan Volume (Gay-Lussac).' },
+
+    // Soal Perhitungan
+    { type:'calc', cat:'Soal Perhitungan',
+      q:'Jika 5 gram A bereaksi dengan 8 gram B membentuk C, berapa massa C? (Hukum Lavoisier)',
+      opts:['8 gram','10 gram','13 gram','15 gram'],
+      ans:2,
+      exp:'Massa C = 5 + 8 = 13 gram (Hukum Kekekalan Massa).' },
+    { type:'calc', cat:'Soal Perhitungan',
+      q:'Dalam CO2, perbandingan massa C : O = 3 : 8. Jika 6 gram C bereaksi sempurna, berapa massa O yang dibutuhkan?',
+      opts:['8 gram','12 gram','16 gram','20 gram'],
+      ans:2,
+      exp:'C : O = 3 : 8. Jika C = 6 gram, maka O = (8/3) × 6 = 16 gram.' },
+    { type:'calc', cat:'Soal Perhitungan',
+      q:'2 liter gas N2 bereaksi dengan 6 liter gas H2 membentuk NH3 (suhu & tekanan sama). Berapa volume NH3 yang dihasilkan? (N2 + 3H2 → 2NH3)',
+      opts:['2 liter','4 liter','6 liter','8 liter'],
+      ans:1,
+      exp:'Perbandingan volume = perbandingan koefisien. N2 : H2 : NH3 = 1 : 3 : 2. Jika N2 = 2 L, NH3 = (2/1) × 2 = 4 liter.' },
+    { type:'calc', cat:'Soal Perhitungan',
+      q:'Pada suhu & tekanan sama, 3 liter gas X mengandung 6 × 10²³ molekul. Berapa molekul dalam 1 liter gas Y?',
+      opts:['1 × 10²³','2 × 10²³','3 × 10²³','6 × 10²³'],
+      ans:1,
+      exp:'Hukum Avogadro: volume sama, jumlah molekul sama. 3 L = 6×10²³, maka 1 L = 2×10²³ molekul.' },
+    { type:'calc', cat:'Soal Perhitungan',
+      q:'Dalam suatu senyawa, 7 gram N bereaksi dengan 16 gram O. Jika 21 gram N bereaksi, berapa gram O yang dibutuhkan? (Perbandingan tetap)',
+      opts:['16 gram','32 gram','48 gram','64 gram'],
+      ans:2,
+      exp:'N : O = 7 : 16. Jika N = 21 gram (3× lipat), maka O = 3 × 16 = 48 gram.' },
+    { type:'calc', cat:'Soal Perhitungan',
+      q:'Massa sebelum reaksi 25 gram. Setelah reaksi terbentuk gas yang massanya 5 gram dan sisa zat padat. Jika tidak ada zat yang hilang, massa zat padat adalah...',
+      opts:['15 gram','20 gram','25 gram','30 gram'],
+      ans:1,
+      exp:'Hukum Kekekalan Massa: massa total = 25 gram. Gas = 5 gram. Zat padat = 25 - 5 = 20 gram.' }
+  ];
+
+  // Pilih 15 soal acak
+  function pickQuizQuestions() {
+    const shuffled = [...quizBank].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, TOTAL_QUIZ_QUESTIONS);
+  }
+
+  /* ============================================================
+     LOGIKA KUIS
+     ============================================================ */
+  let currentQuiz = null;
+
+  function triggerQuiz() {
+    if (boardAnswered >= TOTAL_QUIZ_QUESTIONS) {
+      diceInfo.textContent = '✅ Semua soal telah dijawab!';
+      return;
+    }
+    const q = currentQuiz[boardAnswered];
+    if (!q) return;
+    showQuizModal(q);
+  }
+
+  function showQuizModal(q) {
+    let optsHTML = '';
+    if (q.type === 'tf') {
+      optsHTML = `
+        <button data-ans="true">✅ Benar</button>
+        <button data-ans="false">❌ Salah</button>
+      `;
+    } else {
+      optsHTML = q.opts.map((opt, i) => `<button data-ans="${i}">${String.fromCharCode(65+i)}. ${opt}</button>`).join('');
+    }
+
+    quizContent.innerHTML = `
+      <div class="quiz-category">${q.cat}</div>
+      <h3>❓ Tantangan Kimia</h3>
+      <div class="quiz-question">${q.q}</div>
+      <div class="quiz-options" id="quizOptions">${optsHTML}</div>
+      <div class="quiz-feedback" id="quizFeedback"></div>
+    `;
+    quizModal.classList.add('open');
+
+    const optionButtons = quizContent.querySelectorAll('.quiz-options button');
+    optionButtons.forEach(btn => {
+      btn.addEventListener('click', () => handleQuizAnswer(btn, q));
+    });
+  }
+
+  function handleQuizAnswer(btn, q) {
+    const optionButtons = quizContent.querySelectorAll('.quiz-options button');
+    optionButtons.forEach(b => b.disabled = true);
+
+    let isCorrect = false;
+    if (q.type === 'tf') {
+      isCorrect = (btn.dataset.ans === String(q.ans));
+    } else {
+      isCorrect = (parseInt(btn.dataset.ans) === q.ans);
+    }
+
+    // Tandai jawaban
+    optionButtons.forEach(b => {
+      let bCorrect = false;
+      if (q.type === 'tf') {
+        bCorrect = (b.dataset.ans === String(q.ans));
+      } else {
+        bCorrect = (parseInt(b.dataset.ans) === q.ans);
+      }
+      if (bCorrect) b.classList.add('correct');
+    });
+    if (!isCorrect) btn.classList.add('wrong');
+
+    const feedback = document.getElementById('quizFeedback');
+    let rewardMsg = '';
+
+    if (isCorrect) {
+      boardScore += 10;
+      boardCoins += 5;
+      score += 10;
+      coins += 5;
+      rewardMsg = `<div class="reward">🎁 +10 skor, +5 koin!</div>`;
+      feedback.className = 'quiz-feedback correct-fb show';
+      feedback.innerHTML = `<strong>✅ Jawaban Benar!</strong><br>${q.exp}${rewardMsg}`;
+      playCorrect();
+    } else {
+      feedback.className = 'quiz-feedback wrong-fb show';
+      feedback.innerHTML = `<strong>❌ Jawaban Salah.</strong><br>${q.exp}<br><em>Pelajari lagi ya!</em>`;
+      playWrong();
+    }
+
+    boardAnswered++;
+    updateBoardUI();
+    scoreDisplay.textContent = score;
+    coinDisplay.textContent = coins;
+
+    // Tombol lanjut
+    const nextBtn = document.createElement('button');
+    nextBtn.textContent = boardAnswered >= TOTAL_QUIZ_QUESTIONS ? '🏁 Selesai' : '▶️ Lanjut';
+    nextBtn.style.marginTop = '12px';
+    nextBtn.addEventListener('click', () => {
+      playClick();
+      quizModal.classList.remove('open');
+      if (boardAnswered >= TOTAL_QUIZ_QUESTIONS) {
+        boardFinished();
+      }
+    });
+    feedback.appendChild(document.createElement('br'));
+    feedback.appendChild(nextBtn);
+  }
+
+  function boardFinished() {
+    diceInfo.textContent = `🏆 Kuis selesai! Skor akhir: ${boardScore}, Koin: ${boardCoins}`;
+    messagePanel.textContent = `🎉 ${playerName} menyelesaikan semua tantangan kuis! Skor: ${boardScore}, Koin: ${boardCoins}`;
+    playWin();
+    rollDiceBtn.disabled = true;
+  }
+
+  /* ============================================================
+     LEMPAR DADU & GERAK PION
+     ============================================================ */
+  function rollDice() {
+    if (isRolling) return;
+    if (boardAnswered >= TOTAL_QUIZ_QUESTIONS) {
+      diceInfo.textContent = '✅ Semua soal sudah dijawab!';
+      return;
+    }
+    isRolling = true;
+    rollDiceBtn.disabled = true;
+
+    diceDisplay.classList.add('rolling');
+    playDice();
+
+    let count = 0;
+    const rollInterval = setInterval(() => {
+      diceDisplay.textContent = ['⚀','⚁','⚂','⚃','⚄','⚅'][Math.floor(Math.random()*6)];
+      count++;
+      if (count > 8) {
+        clearInterval(rollInterval);
+        const result = Math.floor(Math.random()*6) + 1;
+        diceDisplay.textContent = ['⚀','⚁','⚂','⚃','⚄','⚅'][result-1];
+        diceInfo.textContent = `🎲 Dadu menunjukkan ${result}!`;
+        movePawn(result);
+      }
+    }, 80);
+  }
+
+  function movePawn(steps) {
+    let target = Math.min(boardPosition + steps, BOARD_SIZE - 1);
+    let current = boardPosition;
+
+    const moveInterval = setInterval(() => {
+      if (current < target) {
+        current++;
+        boardPosition = current;
+        updateBoardUI();
+        playMove();
+      } else {
+        clearInterval(moveInterval);
+        checkSpecialCell();
+      }
+    }, 200);
+  }
+
+  function checkSpecialCell() {
+    if (ladders[boardPosition]) {
+      const dest = ladders[boardPosition];
+      diceInfo.textContent = `🪜 Naik tangga dari ${boardPosition+1} ke ${dest+1}!`;
+      setTimeout(() => {
+        boardPosition = dest;
+        updateBoardUI();
+        playMove();
+        setTimeout(()=>{ finalizeTurn(); }, 400);
+      }, 400);
+    } else if (snakes[boardPosition]) {
+      const dest = snakes[boardPosition];
+      diceInfo.textContent = `🐍 Kena ular! Turun dari ${boardPosition+1} ke ${dest+1}.`;
+      setTimeout(() => {
+        boardPosition = dest;
+        updateBoardUI();
+        playWrong();
+        setTimeout(()=>{ finalizeTurn(); }, 400);
+      }, 400);
+    } else {
+      finalizeTurn();
+    }
+  }
+
+  function finalizeTurn() {
+    if (boardPosition >= BOARD_SIZE - 1) {
+      boardPosition = BOARD_SIZE - 1;
+      updateBoardUI();
+      diceInfo.textContent = `🏁 Selamat! Pion mencapai kotak ${BOARD_SIZE}!`;
+      playWin();
+      rollDiceBtn.disabled = true;
+      return;
+    }
+    // Trigger kuis
+    setTimeout(() => {
+      triggerQuiz();
+      isRolling = false;
+      rollDiceBtn.disabled = false;
+    }, 400);
+  }
+
+  /* ============================================================
+     RESET BOARD
+     ============================================================ */
+  function resetBoard() {
+    boardPosition = 0;
+    boardScore = 0;
+    boardCoins = 0;
+    boardAnswered = 0;
+    currentQuiz = pickQuizQuestions();
+    updateBoardUI();
+    diceDisplay.textContent = '🎲';
+    diceInfo.textContent = 'Klik "Lempar Dadu" untuk mulai!';
+    rollDiceBtn.disabled = false;
+    isRolling = false;
+    playClick();
+  }
+
+  /* ============================================================
+     INIT GAME
+     ============================================================ */
+  function startGame() {
+    initAudio();
+    const name = playerNameInput.value.trim();
+    playerName = name || 'Aisyah';
+    playerNameDisplay.textContent = playerName;
+
+    namePage.style.display = 'none';
+    mainGame.style.display = 'block';
+
+    collectedKeys = [false,false,false,false,false];
+    unlockedIslands = [true,false,false,false,false];
+    playerPosition = 0;
+    score = 0;
+    coins = 0;
+    boardGameSection.classList.remove('active');
+    winMessageDiv.style.display = 'none';
+
+    renderMap();
+    updateKeyDisplay();
+    renderBoard();
+    currentQuiz = pickQuizQuestions();
+
+    messagePanel.textContent = `🧕 ${playerName}, jelajahi pulau dan klik ilmuwan untuk mempelajari hukum dasar kimia!`;
+    scoreDisplay.textContent = '0';
+    coinDisplay.textContent = '0';
+
+    // Aktifkan kontrol
+    document.querySelectorAll('.controls button[data-dir]').forEach(btn => {
+      btn.removeEventListener('click', controlHandler);
+      btn.addEventListener('click', controlHandler);
+    });
+
+    // Aktifkan tombol board
+    rollDiceBtn.removeEventListener('click', rollDice);
+    rollDiceBtn.addEventListener('click', rollDice);
+    resetBoardBtn.removeEventListener('click', resetBoard);
+    resetBoardBtn.addEventListener('click', resetBoard);
+
+    if (soundOn) startMusic();
+  }
+
+  function controlHandler(e) {
+    const dir = e.currentTarget.dataset.dir;
+    playClick();
+    moveCharacter(dir);
+  }
+
+  // Event
+  startBtn.addEventListener('click', startGame);
+  playerNameInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') startGame(); });
+
+  materialModal.addEventListener('click', (e) => {
+    if (e.target === materialModal) materialModal.classList.remove('open');
+  });
+  quizModal.addEventListener('click', (e) => {
+    if (e.target === quizModal) { /* jangan tutup, agar harus jawab */ }
+  });
+
+  // Inisialisasi
+  mainGame.style.display = 'none';
+  namePage.style.display = 'flex';
+  boardGameSection.classList.remove('active');
+})();
+</script>
+</body>
+</html>
